@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Lightbulb, ChevronRight, AlertCircle, AlertTriangle, CheckCircle } from 'lucide-react';
 import { suppliers, products, purchaseOrders } from '../data/procurement';
 import { generateRecommendations } from '../utils/recommendations';
@@ -28,8 +28,26 @@ const ISSUE_TYPE_LABELS: Record<string, string> = {
 
 export default function Recommendations() {
   const navigate = useNavigate();
-  const [filterPriority, setFilterPriority] = useState<RecommendationPriority | typeof ALL>(ALL);
-  const [filterSupplier, setFilterSupplier] = useState(ALL);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const filterPriority = (searchParams.get('priority') ?? ALL) as RecommendationPriority | typeof ALL;
+  const filterSupplier = searchParams.get('supplier') ?? ALL;
+
+  function setParam(key: string, value: string) {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (value === ALL) {
+        next.delete(key);
+      } else {
+        next.set(key, value);
+      }
+      return next;
+    });
+  }
+
+  function clearFilters() {
+    setSearchParams(new URLSearchParams());
+  }
 
   const allRecs = useMemo(
     () => generateRecommendations(suppliers, products, purchaseOrders, DEFAULT_THRESHOLDS),
@@ -75,7 +93,7 @@ export default function Recommendations() {
         <span className="text-sm text-gray-600 font-medium">Filter:</span>
         <select
           value={filterPriority}
-          onChange={e => setFilterPriority(e.target.value as RecommendationPriority | typeof ALL)}
+          onChange={e => setParam('priority', e.target.value)}
           className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value={ALL}>All Priorities</option>
@@ -85,7 +103,7 @@ export default function Recommendations() {
         </select>
         <select
           value={filterSupplier}
-          onChange={e => setFilterSupplier(e.target.value)}
+          onChange={e => setParam('supplier', e.target.value)}
           className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value={ALL}>All Suppliers</option>
@@ -94,7 +112,7 @@ export default function Recommendations() {
         {(filterPriority !== ALL || filterSupplier !== ALL) && (
           <button
             className="text-sm text-blue-600 hover:underline"
-            onClick={() => { setFilterPriority(ALL); setFilterSupplier(ALL); }}
+            onClick={clearFilters}
           >
             Clear filters
           </button>

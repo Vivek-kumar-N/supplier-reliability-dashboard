@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip as RTooltip, ResponsiveContainer, Cell,
   RadarChart, PolarGrid, PolarAngleAxis, Radar,
 } from 'recharts';
-import { ArrowLeft, Mail, Globe, Calendar, Package, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Mail, Globe, Calendar, Package, AlertTriangle, ExternalLink } from 'lucide-react';
 import { suppliers, products, purchaseOrders } from '../data/procurement';
 import { calcSupplierMetrics, calcProductMetrics, DEFAULT_THRESHOLDS } from '../utils/scoring';
 import { detectHiddenIssues } from '../utils/issueDetection';
@@ -134,6 +134,28 @@ export default function SupplierProfile() {
             <p className="text-xs text-gray-500 mt-1">{label}</p>
           </div>
         ))}
+      </div>
+
+      {/* Quick navigation links */}
+      <div className="flex gap-3 flex-wrap mb-6">
+        <Link
+          to={`/purchase-orders?supplier=${id}`}
+          className="inline-flex items-center gap-1.5 text-sm text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg transition-colors"
+        >
+          <ExternalLink size={14} /> View all Purchase Orders
+        </Link>
+        <Link
+          to={`/recommendations?supplier=${id}`}
+          className="inline-flex items-center gap-1.5 text-sm text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-lg transition-colors"
+        >
+          <ExternalLink size={14} /> View Recommendations
+        </Link>
+        <Link
+          to={`/issue-analysis?supplier=${id}`}
+          className="inline-flex items-center gap-1.5 text-sm text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 px-3 py-1.5 rounded-lg transition-colors"
+        >
+          <ExternalLink size={14} /> View Issue Analysis
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">

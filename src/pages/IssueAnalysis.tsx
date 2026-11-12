@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip as RTooltip, ResponsiveContainer, Cell,
 } from 'recharts';
@@ -21,9 +22,23 @@ function pct(n: number) {
 }
 
 export default function IssueAnalysis() {
-  const [filterSupplier, setFilterSupplier] = useState(ALL);
-  const [filterProduct, setFilterProduct] = useState(ALL);
-  const [filterIssueType, setFilterIssueType] = useState(ALL);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const filterSupplier = searchParams.get('supplier') ?? ALL;
+  const filterProduct = searchParams.get('product') ?? ALL;
+  const filterIssueType = searchParams.get('issueType') ?? ALL;
+
+  function setParam(key: string, value: string) {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (value === ALL) {
+        next.delete(key);
+      } else {
+        next.set(key, value);
+      }
+      return next;
+    });
+  }
 
   const allMetrics = useMemo(
     () => calcAllSupplierMetrics(suppliers, purchaseOrders, DEFAULT_THRESHOLDS),
@@ -118,7 +133,7 @@ export default function IssueAnalysis() {
         <span className="text-sm text-gray-600 font-medium">Filter:</span>
         <select
           value={filterSupplier}
-          onChange={e => setFilterSupplier(e.target.value)}
+          onChange={e => setParam('supplier', e.target.value)}
           className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value={ALL}>All Suppliers</option>
@@ -126,7 +141,7 @@ export default function IssueAnalysis() {
         </select>
         <select
           value={filterProduct}
-          onChange={e => setFilterProduct(e.target.value)}
+          onChange={e => setParam('product', e.target.value)}
           className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value={ALL}>All Products</option>
@@ -134,7 +149,7 @@ export default function IssueAnalysis() {
         </select>
         <select
           value={filterIssueType}
-          onChange={e => setFilterIssueType(e.target.value)}
+          onChange={e => setParam('issueType', e.target.value)}
           className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value={ALL}>All Issue Types</option>

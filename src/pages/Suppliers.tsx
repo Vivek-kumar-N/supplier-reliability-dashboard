@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, ChevronRight, Building2 } from 'lucide-react';
 import { suppliers, purchaseOrders } from '../data/procurement';
 import { calcAllSupplierMetrics, DEFAULT_THRESHOLDS } from '../utils/scoring';
@@ -11,8 +11,22 @@ const ALL = 'All';
 
 export default function Suppliers() {
   const navigate = useNavigate();
-  const [search, setSearch] = useState('');
-  const [filterRisk, setFilterRisk] = useState<RiskLevel | typeof ALL>(ALL);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const search = searchParams.get('q') ?? '';
+  const filterRisk = (searchParams.get('risk') ?? ALL) as RiskLevel | typeof ALL;
+
+  function setParam(key: string, value: string) {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (value === ALL || value === '') {
+        next.delete(key);
+      } else {
+        next.set(key, value);
+      }
+      return next;
+    });
+  }
 
   const allMetrics = useMemo(
     () => calcAllSupplierMetrics(suppliers, purchaseOrders, DEFAULT_THRESHOLDS),
@@ -45,13 +59,13 @@ export default function Suppliers() {
             type="text"
             placeholder="Search by name or country…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => setParam('q', e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
         <select
           value={filterRisk}
-          onChange={e => setFilterRisk(e.target.value as RiskLevel | typeof ALL)}
+          onChange={e => setParam('risk', e.target.value)}
           className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value={ALL}>All Risk Levels</option>

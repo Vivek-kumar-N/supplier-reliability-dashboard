@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, Filter } from 'lucide-react';
 import { suppliers, products, purchaseOrders } from '../data/procurement';
 import { isLate } from '../utils/dateUtils';
@@ -10,10 +11,28 @@ import type { POStatus } from '../types';
 const ALL = 'All';
 
 export default function PurchaseOrders() {
-  const [search, setSearch] = useState('');
-  const [filterSupplier, setFilterSupplier] = useState(ALL);
-  const [filterProduct, setFilterProduct] = useState(ALL);
-  const [filterStatus, setFilterStatus] = useState<POStatus | typeof ALL>(ALL);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const search = searchParams.get('q') ?? '';
+  const filterSupplier = searchParams.get('supplier') ?? ALL;
+  const filterProduct = searchParams.get('product') ?? ALL;
+  const filterStatus = (searchParams.get('status') ?? ALL) as POStatus | typeof ALL;
+
+  function setParam(key: string, value: string) {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (value === ALL || value === '') {
+        next.delete(key);
+      } else {
+        next.set(key, value);
+      }
+      return next;
+    });
+  }
+
+  function clearFilters() {
+    setSearchParams(new URLSearchParams());
+  }
 
   const filtered = useMemo(() => {
     return purchaseOrders.filter(po => {
@@ -37,6 +56,8 @@ export default function PurchaseOrders() {
     });
   }, [search, filterSupplier, filterProduct, filterStatus]);
 
+  const hasFilters = search !== '' || filterSupplier !== ALL || filterProduct !== ALL || filterStatus !== ALL;
+
   return (
     <div className="max-w-7xl mx-auto">
       <Header
@@ -53,7 +74,7 @@ export default function PurchaseOrders() {
               type="text"
               placeholder="Search by ID, supplier, or product…"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={e => setParam('q', e.target.value)}
               className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
@@ -62,7 +83,7 @@ export default function PurchaseOrders() {
             <Filter size={15} className="text-gray-400" />
             <select
               value={filterSupplier}
-              onChange={e => setFilterSupplier(e.target.value)}
+              onChange={e => setParam('supplier', e.target.value)}
               className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               <option value={ALL}>All Suppliers</option>
@@ -73,7 +94,7 @@ export default function PurchaseOrders() {
 
             <select
               value={filterProduct}
-              onChange={e => setFilterProduct(e.target.value)}
+              onChange={e => setParam('product', e.target.value)}
               className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               <option value={ALL}>All Products</option>
@@ -84,7 +105,7 @@ export default function PurchaseOrders() {
 
             <select
               value={filterStatus}
-              onChange={e => setFilterStatus(e.target.value as POStatus | typeof ALL)}
+              onChange={e => setParam('status', e.target.value)}
               className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               <option value={ALL}>All Statuses</option>
@@ -92,6 +113,15 @@ export default function PurchaseOrders() {
               <option value="partial">Partial</option>
               <option value="pending">Pending</option>
             </select>
+
+            {hasFilters && (
+              <button
+                className="text-sm text-blue-600 hover:underline"
+                onClick={clearFilters}
+              >
+                Clear
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -103,7 +133,7 @@ export default function PurchaseOrders() {
           <p className="text-gray-500">No purchase orders match your filters.</p>
           <button
             className="mt-3 text-sm text-blue-600 hover:underline"
-            onClick={() => { setSearch(''); setFilterSupplier(ALL); setFilterProduct(ALL); setFilterStatus(ALL); }}
+            onClick={clearFilters}
           >
             Clear filters
           </button>
