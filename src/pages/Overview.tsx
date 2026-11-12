@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip as RTooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import {
-  Building2, ShoppingCart, TrendingUp, AlertTriangle, ArrowRight, ChevronDown, ChevronUp,
+  Building2, ShoppingCart, TrendingUp, AlertTriangle, ArrowRight,
 } from 'lucide-react';
 import { suppliers, products, purchaseOrders } from '../data/procurement';
 import {
@@ -29,7 +29,6 @@ const PIE_COLORS = ['#22c55e', '#eab308', '#f97316', '#ef4444'];
 
 export default function Overview() {
   const navigate = useNavigate();
-  const [showDemo, setShowDemo] = useState(false);
 
   const allMetrics = useMemo(
     () => calcAllSupplierMetrics(suppliers, purchaseOrders, DEFAULT_THRESHOLDS),
@@ -76,53 +75,7 @@ export default function Overview() {
       <Header
         title="Overview"
         subtitle="Supplier reliability at a glance — as of 12 Nov 2026"
-        actions={
-          <button
-            onClick={() => setShowDemo(v => !v)}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg transition-colors"
-          >
-            Demo Story {showDemo ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-          </button>
-        }
       />
-
-      {/* Demo story walkthrough */}
-      {showDemo && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6 text-sm">
-          <p className="font-semibold text-blue-900 mb-3">📖 Hackathon Demo Walkthrough</p>
-          <ol className="space-y-2 text-blue-800 list-decimal list-inside">
-            <li>Start here on the <strong>Overview</strong> — note GlobalTech Solutions shows <strong>Medium</strong> risk overall.</li>
-            <li>Scroll down — the hidden-issue alert reveals a <strong>Critical product-level problem</strong> for GlobalTech × Laptop Batteries.</li>
-            <li>
-              Click{' '}
-              <button className="underline font-semibold hover:text-blue-600" onClick={() => navigate('/suppliers/SUP001')}>
-                GlobalTech Solutions
-              </button>{' '}
-              to open their supplier profile.
-            </li>
-            <li>In the profile, see the <strong>Critical hidden issue banner</strong> — PRD001 on-time rate is &lt;15% while overall is ~72%.</li>
-            <li>Check the <strong>Product-Level Metrics table</strong> — Laptop Batteries row is highlighted in red.</li>
-            <li>Read the <strong>Recommendation</strong>: "Schedule a delivery performance review with GlobalTech Solutions for Laptop Batteries."</li>
-            <li>
-              Navigate to{' '}
-              <button className="underline font-semibold hover:text-blue-600" onClick={() => navigate('/issue-analysis')}>
-                Issue Analysis
-              </button>{' '}
-              to see the heatmap — GlobalTech × Laptop Batteries cell is the darkest.
-            </li>
-            <li>
-              Visit{' '}
-              <button className="underline font-semibold hover:text-blue-600" onClick={() => navigate('/recommendations')}>
-                Recommendations
-              </button>{' '}
-              for the full High-priority action list with traceable PO evidence.
-            </li>
-          </ol>
-          <p className="mt-3 text-xs text-blue-700 italic">
-            Key message: overall delivery statistics showed GlobalTech as Medium risk — but product-level analysis revealed Laptop Batteries deliveries were late 11 out of 12 times.
-          </p>
-        </div>
-      )}
 
       {/* KPI Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
