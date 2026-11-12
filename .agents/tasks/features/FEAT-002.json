@@ -1,0 +1,30 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Layout, shared components, and all six pages. This is the UI layer built on top of the FEAT-001 data/logic layer.",
+  "status": "completed",
+  "steps": [
+    "Step 1 — App shell: Update src/App.tsx to use React Router v6 BrowserRouter with routes: / → Overview, /purchase-orders → PurchaseOrders, /suppliers → Suppliers, /suppliers/:id → SupplierProfile, /issue-analysis → IssueAnalysis, /recommendations → Recommendations. Wrap all routes inside a Layout component with Outlet.",
+    "Step 2 — Layout: Create src/components/layout/Layout.tsx (Outlet + Sidebar + Header), src/components/layout/Sidebar.tsx (navigation links), src/components/layout/Header.tsx (page title).",
+    "Step 3 — Shared components: KPICard, StatusBadge, HiddenIssueCard, RiskBadge, Tooltip wrapper.",
+    "Step 4 — Overview page: src/pages/Overview.tsx — KPI cards for total suppliers, total POs, avg reliability score, hidden issues count. Bar chart of supplier reliability scores. Risk distribution pie chart.",
+    "Step 5 — Purchase Orders page: src/pages/PurchaseOrders.tsx — filterable table of all POs with supplier, product, dates, status, risk indicators.",
+    "Step 6 — Suppliers page: src/pages/Suppliers.tsx — supplier cards/table with metrics and risk badges, link to profile.",
+    "Step 7 — Supplier Profile page: src/pages/SupplierProfile.tsx — detailed view with product-level metrics, hidden issues, recommendations for that supplier.",
+    "Step 8 — Issue Analysis page: src/pages/IssueAnalysis.tsx — most delayed suppliers, recurring delay products, quantity shortfall, quality problems, heatmap.",
+    "Step 9 — Recommendations page: src/pages/Recommendations.tsx — full recommendations list with filters by priority and supplier."
+  ],
+  "acceptance_criteria": [
+    "npm run build exits 0 with zero TypeScript errors",
+    "All 6 routes render without crashing: /, /purchase-orders, /suppliers, /suppliers/SUP001, /issue-analysis, /recommendations",
+    "Overview KPI cards show correct aggregated numbers",
+    "SUP001 profile shows Medium overall risk but flags PRD001 as a hidden critical delivery issue",
+    "Issue Analysis shows GlobalTech Solutions as top delayed supplier for PRD001",
+    "Recommendations page shows at least one High priority recommendation for SUP001"
+  ],
+  "verification": [
+    "cd 'c:\\Users\\vs065\\OneDrive\\Desktop\\pod12' && npm run build — must exit 0 with zero TypeScript errors"
+  ],
+  "blocked_reason": null,
+  "findings": "Build passes (exit 0, zero TypeScript errors). Three Recharts Tooltip formatter type errors fixed by removing explicit number type annotations (Recharts 3.x uses ValueType which includes undefined). Duplicate HEAT_COLORS declaration removed from IssueAnalysis.tsx. All 6 routes implemented: /, /purchase-orders, /suppliers, /suppliers/:id, /issue-analysis, /recommendations. SUP001 SupplierProfile shows Medium overall risk with a Critical hidden issue banner for PRD001 (Laptop Batteries). IssueAnalysis heatmap highlights GlobalTech×Laptop Batteries cell as the worst. Recommendations page surfaces the High-priority hidden-delivery recommendation for SUP001×PRD001 with 11 supporting PO IDs."
+}
